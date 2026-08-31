@@ -1,0 +1,40 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a single command using the runners shell
+      - name: Pull docker image
+        run: docker pull microros/micro_ros_static_library_builder:humble
+
+      # Runs a set of commands using the runners shell
+      - name: Build project
+        run: |
+          echo $(pwd)
+          chmod 777 $(pwd)/micro_ros_stm32cubemx_utils/microros_static_library/library_generation/library_generation.sh
+          chmod u+x $(pwd)/micro_ros_stm32cubemx_utils/microros_static_library/library_generation/library_generation.sh
+          docker run --rm -v $(pwd):/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library microros/micro_ros_static_library_builder:humble
+
+      - name: Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "micro_ros_stm32cubemx_utils_build"
+          path: ${{ github.workspace }}/micro_ros_stm32cubemx_utils
+          compression-level: 0
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`

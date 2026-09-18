@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2025 STMicroelectronics.
+  * Copyright (c) 2026 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -30,6 +30,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdarg.h>
+#include <stdio.h>
 
 /* USER CODE END Includes */
 
@@ -110,6 +112,8 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
+  Debug_Print("USART3 printf test OK\r\n");
+  Debug_Print("USART3: PC10 TX, PC11 RX, 115200 8N1\r\n");
 
   /* USER CODE END 2 */
 
@@ -180,6 +184,25 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void Debug_Print(const char *format, ...)
+{
+  char buffer[256];
+  va_list args;
+  int length;
+
+  va_start(args, format);
+  length = vsnprintf(buffer, sizeof(buffer), format, args);
+  va_end(args);
+
+  if (length > 0)
+  {
+    if (length >= (int)sizeof(buffer))
+    {
+      length = sizeof(buffer) - 1;
+    }
+    HAL_UART_Transmit(&huart3, (uint8_t *)buffer, (uint16_t)length, 1000);
+  }
+}
 
 /* USER CODE END 4 */
 

@@ -71,7 +71,10 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, DIN2_Pin|DIN1_Pin|CIN2_Pin|CIN1_Pin
                           |BIN2_Pin|BIN1_Pin|AIN2_Pin|AIN1_Pin
-                          |ultra_front_trig_Pin|buzzer_Pin, GPIO_PIN_RESET);
+                          |ultra_front_trig_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(buzzer_GPIO_Port, buzzer_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : key_2_Pin key_1_Pin */
   GPIO_InitStruct.Pin = key_2_Pin|key_1_Pin;
@@ -117,11 +120,9 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pins : DIN2_Pin DIN1_Pin CIN2_Pin CIN1_Pin
-                           BIN2_Pin BIN1_Pin AIN2_Pin AIN1_Pin
-                           buzzer_Pin */
+                           BIN2_Pin BIN1_Pin AIN2_Pin AIN1_Pin */
   GPIO_InitStruct.Pin = DIN2_Pin|DIN1_Pin|CIN2_Pin|CIN1_Pin
-                          |BIN2_Pin|BIN1_Pin|AIN2_Pin|AIN1_Pin
-                          |buzzer_Pin;
+                          |BIN2_Pin|BIN1_Pin|AIN2_Pin|AIN1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
@@ -152,6 +153,13 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : buzzer_Pin */
+  GPIO_InitStruct.Pin = buzzer_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(buzzer_GPIO_Port, &GPIO_InitStruct);
 
 }
 

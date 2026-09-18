@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#define USART_RX_DMA_STREAM DMA1_Stream1
+#define USART_TX_DMA_STREAM DMA1_Stream3
+#define USART_HANDLE huart3
 
 #ifdef RMW_UXRCE_TRANSPORT_CUSTOM
 
@@ -30,7 +33,7 @@ bool cubemx_transport_close(struct uxrCustomTransport * transport){
     return true;
 }
 
-size_t cubemx_transport_write(struct uxrCustomTransport* transport, uint8_t * buf, size_t len, uint8_t * err){
+size_t cubemx_transport_write(struct uxrCustomTransport* transport, const uint8_t * buf, size_t len, uint8_t * err){
     UART_HandleTypeDef * uart = (UART_HandleTypeDef*) transport->args;
 
     HAL_StatusTypeDef ret;

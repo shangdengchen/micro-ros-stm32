@@ -20,9 +20,11 @@ This tool aims to ease the micro-ROS integration in a STM32CubeMX/IDE project.
   - [Purpose of the Project](#purpose-of-the-project)
   - [License](#license)
   - [Known Issues/Limitations](#known-issueslimitations)
+
 ## Middlewares available
 
 This package support the usage of micro-ROS on top of two different middlewares:
+
 - [eProsima Micro XRCE-DDS](https://micro-xrce-dds.docs.eprosima.com/en/latest/): the default micro-ROS middleware.
 - [embeddedRTPS](https://github.com/embedded-software-laboratory/embeddedRTPS): an experimental implementation of a RTPS middleware compatible with ROS 2. **Instructions on how to use it available [here](./embeddedrtps.md).**
 
@@ -56,17 +58,14 @@ This package support the usage of micro-ROS on top of two different middlewares:
    print_cflags:
       @echo $(CFLAGS)
    ```
-
 6. Execute the static library generation tool. Compiler flags will retrieved automatically from your `Makefile` and user will be prompted to check if they are correct.
-
 
    ```bash
    docker pull microros/micro_ros_static_library_builder:humble
    docker run -it --rm -v $(pwd):/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library microros/micro_ros_static_library_builder:humble
    ```
-
-1. Modify your `main.c` to use micro-ROS. An example application can be found in `sample_main.c`.
-2. Continue your usual workflow building your project and flashing the binary:
+7. Modify your `main.c` to use micro-ROS. An example application can be found in `sample_main.c`.
+8. Continue your usual workflow building your project and flashing the binary:
 
    ```bash
    make -j$(nproc)
@@ -82,16 +81,17 @@ micro-ROS can be used with SMT32CubeIDE following these steps:
    ```bash
    docker pull microros/micro_ros_static_library_builder:humble && docker run --rm -v ${workspace_loc:/${ProjName}}:/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:humble
    ```
-
 3. Add micro-ROS include directory. In `Project -> Settings -> C/C++ Build -> Settings -> Tool Settings Tab -> MCU GCC Compiler -> Include paths` add `micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include`
 4. Add the micro-ROS precompiled library. In `Project -> Settings -> C/C++ Build -> Settings -> MCU GCC Linker -> Libraries`
-      - add `<ABSOLUTE_PATH_TO>/micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros` in `Library search path (-L)`
-      - add `microros` in `Libraries (-l)`
+
+   - add `<ABSOLUTE_PATH_TO>/micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros` in `Library search path (-L)`
+   - add `microros` in `Libraries (-l)`
 5. Add the following source code files to your project, dragging them to source folder:
-      - `extra_sources/microros_time.c`
-      - `extra_sources/microros_allocators.c`
-      - `extra_sources/custom_memory_manager.c`
-      - `extra_sources/microros_transports/dma_transport.c` or your transport selection.
+
+   - `extra_sources/microros_time.c`
+   - `extra_sources/microros_allocators.c`
+   - `extra_sources/custom_memory_manager.c`
+   - `extra_sources/microros_transports/dma_transport.c` or your transport selection.
 6. Make sure that if you are using FreeRTOS, the micro-ROS task **has more than 10 kB of stack**: [Detail](.images/Set_freertos_stack.jpg)
 7. Configure the transport interface on the STM32CubeMX project, check the [Transport configuration](#Transport-configuration) section for instructions on the custom transports provided.
 8. Build and run your project
@@ -107,64 +107,71 @@ micro-ROS can be used with SMT32CubeIDE in Windows 11 OS, following these steps:
    docker pull microros/micro_ros_static_library_builder:humble
    docker run --rm -v <ABSOLUTE_PATH_TO_PROJECT>:/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:humble
    ```
+
 Follow steps 4 to 8.
 Noticed that thist steps where tested with ROS 2 Humble, but should work on any distribution. micro-ROS Agent could be build and run in Ubuntu using WSL.
 
 ## Transport configuration
 
 Available transport for this platform are:
+
 ### U(S)ART with DMA
 
 Steps to configure:
-   - Enable U(S)ART in your STM32CubeMX
-   - For the selected USART, enable DMA for Tx and Rx under `DMA Settings`
-   - Set the DMA priotity to `Very High` for Tx and Rx
-   - Set the DMA mode to `Circular` for Rx: [Detail](.images/Set_UART_DMA1.jpg)
-   - For the selected, enable `global interrupt` under `NVIC Settings`: [Detail](.images/Set_UART_DMA_2.jpg)
+
+- Enable U(S)ART in your STM32CubeMX
+- For the selected USART, enable DMA for Tx and Rx under `DMA Settings`
+- Set the DMA priotity to `Very High` for Tx and Rx
+- Set the DMA mode to `Circular` for Rx: [Detail](.images/Set_UART_DMA1.jpg)
+- For the selected, enable `global interrupt` under `NVIC Settings`: [Detail](.images/Set_UART_DMA_2.jpg)
 
 ### U(S)ART with Interrupts
 
 Steps to configure:
-   - Enable U(S)ART in your STM32CubeMX
-   - For the selected USART, enable `global interrupt` under `NVIC Settings`: [Detail](.images/Set_UART_IT.jpg)
+
+- Enable U(S)ART in your STM32CubeMX
+- For the selected USART, enable `global interrupt` under `NVIC Settings`: [Detail](.images/Set_UART_IT.jpg)
 
 ### USB CDC
 
 Steps to configure:
-   - Enable the USB in your STM32CubeMX `Connectivity` tab.
-   - Select the `Communication Device Class (Virtual Port Com)` mode on the `Middleware -> USB_DEVICE` configuration.
 
-      **Note: The micro-ROS transport will override the autogenerated `USB_DEVICE/App/usbd_cdc_if.c` methods.**
+- Enable the USB in your STM32CubeMX `Connectivity` tab.
+- Select the `Communication Device Class (Virtual Port Com)` mode on the `Middleware -> USB_DEVICE` configuration.
+
+  **Note: The micro-ROS transport will override the autogenerated `USB_DEVICE/App/usbd_cdc_if.c` methods.**
 
 ### UDP
 
 Steps to configure:
-   - Enable Ethernet in your STM32CubeMX/IDE `Connectivity` tab.
-   - Enable LwIP in your STM32CubeMX/IDE `Middleware` tab.
-   - Make sure that LwIP has the following configuration:
 
-      ```
-      Platform Setting according to your own board
-      LwIP -> General Settings -> LWIP_DHCP -> Disabled
-      LwIP -> General Settings -> IP Address Settings (Set here the board address and mask)
-      LwIP -> General Settings -> LWIP UDP -> Enabled
-      LwIP -> General Settings -> Procols Options -> MEMP_NUM_UDP_PCB -> 15
-      LwIP -> Key Options -> LWIP_SO_RCVTIMEO -> Enable
-      ```
+- Enable Ethernet in your STM32CubeMX/IDE `Connectivity` tab.
+- Enable LwIP in your STM32CubeMX/IDE `Middleware` tab.
+- Make sure that LwIP has the following configuration:
+
+  ```
+  Platform Setting according to your own board
+  LwIP -> General Settings -> LWIP_DHCP -> Disabled
+  LwIP -> General Settings -> IP Address Settings (Set here the board address and mask)
+  LwIP -> General Settings -> LWIP UDP -> Enabled
+  LwIP -> General Settings -> Procols Options -> MEMP_NUM_UDP_PCB -> 15
+  LwIP -> Key Options -> LWIP_SO_RCVTIMEO -> Enable
+  ```
 
    **Note: Ensure your board and Agent are within the same LAN. The default port is 8888. You can modify it in `udp_transport.c`.If you are using a board from the STM32H7 series, please set up the MPU correctly.**
 
-   - Use `sample_main_udp.c` as a reference for writing your application code.
-   - Start the micro-ROS Agent with the following arguments:
+- Use `sample_main_udp.c` as a reference for writing your application code.
+- Start the micro-ROS Agent with the following arguments:
 
-        ```
-        ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888 -v 6
-        ```
+  ```
+  ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888 -v 6
+  ```
 
 ## Customizing the micro-ROS library
 
 All the micro-ROS configuration can be done in `colcon.meta` file before step 3. You can find detailed information about how to tune the static memory usage of the library in the [Middleware Configuration tutorial](https://micro.ros.org/docs/tutorials/advanced/microxrcedds_rmw_configuration/).
-## Adding custom packages
+
+Adding custom packages
 
 Note that folders added to `microros_static_library/library_generation/extra_packages/` and entries added to `/microros_static_library/library_generation/extra_packages/extra_packages.repos` will be taken into account by this build system.
 
